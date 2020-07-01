@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const gravatar = require('gravatar');
 
 
 const userModel = require('../../model/user');
@@ -18,12 +19,20 @@ router.post('/register', (req, res) => {
                 error : err.message
             })           
         }else{
+
+            const avatar = gravatar.url(req.body.email, {
+                s: '200', //size
+                r: 'pg', // Rating
+                d: 'mm'  // Default
+            });
+
+
             // password 암호화 성공 후 db 저장
             const newUser = new userModel({
                 username : req.body.username,
                 email: req.body.email,
                 password:hash,
-                avatar: req.body.avatar
+                avatar: avatar
             })
         
             newUser
