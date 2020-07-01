@@ -1,15 +1,37 @@
 const express = require('express');
 const router = express.Router();
 
+const userModel = require('../../model/user');
 
 // @route   POST user/register
 // @desc    user register
 // @access  Public
 
 router.post('/register', (req, res) => {
-    res.json({
-        message : 'registed user'
+    const newUser = new userModel({
+        username : req.body.username,
+        email: req.body.email,
+        password:req.body.password,
+        avatar: req.body.avatar
     })
+
+    newUser
+        .save()
+        .then(result => {
+            res.json({
+                message : 'successful sign up',
+                userInfo: result
+            })
+        })
+        .catch(err => {
+            res.json({
+                error : err.message
+            })
+        })
+    
+    // res.json({
+    //     message : 'registed user'
+    // })
 })
 
 
