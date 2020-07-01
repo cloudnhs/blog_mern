@@ -85,9 +85,35 @@ router.post('/register', (req, res) => {
 // @access  Public
 
 router.post('/login', (req, res) => {
-    res.json({
-        message : 'user login'
-    })
+    // email 유무체크
+    userModel
+        .findOne({email: req.body.email})
+        .then(user => {
+            //console.log(user)  //null값을 회신
+            if(!user) {
+                return res.json({
+                    error: 'user not found'
+                })
+            }else{
+            //비밀번호 체크
+                bcrypt.compare(req.body.password, user.password, (err, result) => {
+                    console.log(result)
+                    if(err || result ===false) {
+                        return res.status(400).json({
+                            message: "password incorrect"
+                        });
+                    }else{
+                        res.status(200).json({
+                            message: "successful login",
+                            userInfo: user
+                        })
+                    }
+                } ) 
+            }
+        })
+    // res.json({
+    //     message : 'user login'
+    // })
 })
 
 
