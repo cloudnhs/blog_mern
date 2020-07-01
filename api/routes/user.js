@@ -3,6 +3,15 @@ const router = express.Router();
 
 
 
+// @route   GET user/test
+// @desc    Test user route
+// @access  Public
+
+router.get('/test', (req, res) => {
+    res.json({message : 'api test'});
+})
+
+
 
 
 module.exports = router;
