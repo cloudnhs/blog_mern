@@ -10,9 +10,12 @@ const userModel = require('../../model/user');
 // @desc    user register
 // @access  Public
 
-router.post('/register', (req, res) => {
 
-    bcrypt.hash(req.body.password, 10, (err, hash) => {
+router.post('/register', (req, res) => {
+    
+    const {email, password, username} = req.body;
+
+    bcrypt.hash(password, 10, (err, hash) => {
         //password 암호화 실패
         if(err) {
             return res.status(500).json({
@@ -20,7 +23,8 @@ router.post('/register', (req, res) => {
             })           
         }else{
 
-            const avatar = gravatar.url(req.body.email, {
+            // const avatar = gravatar.url(req.body.email, {
+            const avatar = gravatar.url(email, {
                 s: '200', //size
                 r: 'pg', // Rating
                 d: 'mm'  // Default
@@ -29,9 +33,9 @@ router.post('/register', (req, res) => {
 
             // password 암호화 성공 후 db 저장
             const newUser = new userModel({
-                username : req.body.username,
-                email: req.body.email,
-                password:hash,
+                username,
+                email,
+                password: hash,
                 avatar: avatar
             })
         
