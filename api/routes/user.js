@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
+
 
 
 const userModel = require('../../model/user');
@@ -103,10 +105,20 @@ router.post('/login', (req, res) => {
                             message: "password incorrect"
                         });
                     }else{
+                        //json web token 생성
+                        const token = jwt.sign(
+                            {
+                                email : user.email,
+                                userId: user._id
+                            },
+                            process.env.SECRET,
+                            {expiresIn: "1h"}
+                        );    
+                        
                         res.status(200).json({
-                            message: "successful login",
-                            userInfo: user
-                        })
+                             message: "successful login",
+                             userInfo: token
+                         })
                     }
                 } ) 
             }
