@@ -15,50 +15,68 @@ router.post('/register', (req, res) => {
     
     const {email, password, username} = req.body;
 
-    bcrypt.hash(password, 10, (err, hash) => {
-        //password 암호화 실패
-        if(err) {
-            return res.status(500).json({
-                error : err.message
-            })           
-        }else{
-
-            // const avatar = gravatar.url(req.body.email, {
-            const avatar = gravatar.url(email, {
-                s: '200', //size
-                r: 'pg', // Rating
-                d: 'mm'  // Default
-            });
-
-
-            // password 암호화 성공 후 db 저장
-            const newUser = new userModel({
-                username,
-                email,
-                password: hash,
-                avatar: avatar
-            })
-        
-            newUser
-                .save()
-                .then(result => {
-                    res.json({
-                        message : 'successful sign up',
-                        userInfo: result
-                    })
-                })
-                .catch(err => {
-                    res.json({
-                        error : err.message
-                    });
+    userModel
+        .findOne({email : email})
+        .then(user => {
+            // user의 email이 등록되어 있을 경우 error를 반환한다
+            if(user){
+                return res.json({
+                    message : 'email already exists'
                 });
-        }
-    })
+            }else{
+                // user의 email이 없는 경우에는 db에 저장한다.
+                // password 암호화
+                bcrypt.hash(password, 10, (err, hash) => {
+                    //password 암호화 실패
+                    if(err) {
+                        return res.status(500).json({
+                            error : err.message
+                        })           
+                    }else{
+            
+                        // const avatar = gravatar.url(req.body.email, {
+                        const avatar = gravatar.url(email, {
+                            s: '200', //size
+                            r: 'pg', // Rating
+                            d: 'mm'  // Default
+                        });
+            
+            
+                        // password 암호화 성공 후 db 저장
+                        const newUser = new userModel({
+                            username,
+                            email,
+                            password: hash,
+                            avatar: avatar
+                        })
+                    
+                        newUser
+                            .save()
+                            .then(result => {
+                                res.json({
+                                    message : 'successful sign up',
+                                    userInfo: result
+                                })
+                            })
+                            .catch(err => {
+                                res.json({
+                                    error : err.message
+                                });
+                            });
+                    }
+                })
+            }
+        })
+        .catch(err => {
+            res.json({
+                message : err.message
+            });
+        });
+
+
     
     
-    // res.json({
-    //     message : 'registed user'
-    // })
+    
 })
 
 
